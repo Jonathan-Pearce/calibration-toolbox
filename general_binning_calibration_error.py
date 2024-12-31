@@ -25,5 +25,3 @@ def general_binning_calibration_error(prob, labels, n_bins = 15, class_cond = Fa
     if(class_cond):
 
     if(adaptive_bins):
-
-    
