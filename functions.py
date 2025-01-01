@@ -16,10 +16,28 @@ def get_bin_boundaries(prob, n_bins, adaptive_bins):
     else:
         bin_boundaries = np.linspace(0, 1, n_bins + 1)
 
+    return(bin_boundaries)
+
+def compute_bins(prob, labels, n_bins, bin_boundaries):
+    bin_prop = np.zeros(n_bins)
+    bin_acc = np.zeros(n_bins)
+    bin_conf = np.zeros(n_bins)
+    bin_score = np.zeros(n_bins)
+
     #return bin_boundaries and have two small functions?
     #return these in a list
     bin_lowers = bin_boundaries[:-1]
     bin_uppers = bin_boundaries[1:]
+
+    for i, (bin_lower, bin_upper) in enumerate(zip(bin_lowers, bin_uppers)):
+        # Calculated |confidence - accuracy| in each bin
+        in_bin = np.greater(confidences,bin_lower.item()) * np.less_equal(confidences,bin_upper.item())
+        bin_prop[i] = np.mean(in_bin)
+
+        if bin_prop[i].item() > 0:
+            bin_acc[i] = np.mean(accuracies[in_bin])
+            bin_conf[i] = np.mean(confidences[in_bin])
+            bin_score[i] = np.abs(bin_conf[i] - bin_acc[i])
 
 
 def calc_bin_score():
