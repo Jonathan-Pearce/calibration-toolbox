@@ -1,8 +1,29 @@
-# Calibration Library
-
+# Calibration-Toolbox
 ## Metrics
+### General Calibration Error (GCE)
 
--  ECE
+$\sum_{x=1}^n x=0$
+
+#### ECE
+```Python
+#wrapper function
+ECE = ECE(data)
+
+#or from general function
+ECE = GCE(data, norm = 1, top_n = 1) 
+```
+#### MCE
+```Python
+#wrapper function
+ECE = MCE(data)
+
+#or from general function
+ECE = GCE(data, norm = "inf", top_n = 1) 
+```
+#### ACE
+#### SCE
+
+### Other Metrics
 -  CWCE
 -  TCE
 -  KS
