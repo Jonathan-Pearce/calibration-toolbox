@@ -1,5 +1,16 @@
 # Calibration Library
 
+## Metrics
+
+-  ECE
+-  CWCE
+-  TCE
+-  KS
+-  MMCE
+-  KCE
+
+$\sum_{x=1}^n x=0$
+
 ## Jonathan Pearce, McGill University
 
 A model calibration library currently under construction. Built for PyTorch models, this library enables users to evaluate their model's uncertainty estimates (probability estimates) using popular calibration metrics, train model wrappers that improve model calibration and generate data visualizations to identify where and how their model's are well calibrated or not.
