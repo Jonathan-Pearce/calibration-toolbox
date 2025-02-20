@@ -1,7 +1,11 @@
 # Calibration-Toolbox
 ## Metrics
 ### General Calibration Error (GCE)
+```Python
+general_calibration_error = GCE(data, bin = 15, class_conditional = TRUE, adaptive_bins = TRUE,
+                                top_n_prob = 1, norm = 1, thresholding = 0.01)
 
+```
 $\sum_{x=1}^n x=0$
 
 #### ECE
@@ -12,6 +16,18 @@ ECE = ECE(data)
 #or from general function
 ECE = GCE(data, norm = 1, top_n = 1) 
 ```
+
+#### RMSCE (Root Mean Squared Calibration Error)
+https://lightning.ai/docs/torchmetrics/stable/classification/calibration_error.html
+https://arxiv.org/pdf/1812.04606
+```Python
+#wrapper function
+RMSCE = RMSCE(data)
+
+#or from general function
+RMSCE = GCE(data, norm = 2, top_n = 1) 
+```
+
 #### MCE
 ```Python
 #wrapper function
