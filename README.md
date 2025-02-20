@@ -36,6 +36,9 @@ ECE = MCE(data)
 #or from general function
 ECE = GCE(data, norm = "inf", top_n = 1) 
 ```
+#### Top-R prediction
+https://arxiv.org/abs/2006.12800
+
 #### ACE
 #### SCE
 
