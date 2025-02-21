@@ -1,4 +1,5 @@
 # Calibration-Toolbox
+Logits: https://github.com/markus93/NN_calibration/tree/master/logits
 ## Metrics
 ### General Calibration Error (GCE)
 ```Python
