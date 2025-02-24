@@ -1,132 +1,61 @@
 import sys
 import numpy as np
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
 
-from scipy.special import softmax
+x = np.load('data/cifar10h-probs.npy')
+print(x)
 
-import torch
-from torch import nn, optim
-from torch.nn import functional as F
-import torch.nn.init as init
+n_classes = np.size(x[1])
+print(n_classes)
+n_data = np.size(x)
+print(np.size(x))
 
-import torchvision
-import torchvision as tv
-import torchvision.transforms as transforms
+y = np.load('data/test.npy')
+print(y)
 
-sys.path.insert(1, 'models/')
-import resnet
-import metrics
-import recalibration
-import visualization
+y_2d = np.zeros_like(x)
+print(y_2d)
 
-np.random.seed(0)
+desired_cols = y.flatten()
+desired_rows = np.arange(len(desired_cols))
+print(desired_cols)
+print(desired_rows)
+y_2d[desired_rows, desired_cols] = 1
 
-
-
-PATH = './pretrained_models/cifar10_resnet20.pth'
-net_trained = resnet.ResNet(resnet.BasicBlock, [3, 3, 3])
-net_trained.load_state_dict(torch.load(PATH,map_location=torch.device('cpu')))
+print(y_2d)
 
 
-# Data transforms
+z = x[1]
 
-mean = [0.5071, 0.4867, 0.4408]
-stdv = [0.2675, 0.2565, 0.2761]
+A = np.array([1, 7, 9, 2, 0.1, 17, 17, 1.5])
+k = 3
 
-test_transforms = tv.transforms.Compose([
-    tv.transforms.ToTensor(),
-    tv.transforms.Normalize(mean=mean, std=stdv),
-])
+idx = np.argpartition(A, -k)
+print(idx)
+print(A[idx[:-k]])
 
-# IMPORTANT! We need to use the same validation set for temperature
-# scaling, so we're going to save the indices for later
-test_set = tv.datasets.CIFAR10(root='./data', train=False, transform=test_transforms, download=True)
-testloader = torch.utils.data.DataLoader(test_set, pin_memory=True, batch_size=4)
+arr_threshold = np.max(A[idx[:-k]])
+print(arr_threshold)
 
-correct = 0
-total = 0
+A[A <= arr_threshold] = -1
 
-# First: collect all the logits and labels for the validation set
-logits_list = []
-labels_list = []
+print(A)
 
+k = 3
+print(n_data-1)
 
-with torch.no_grad():
-    for images, labels in testloader:
-        #outputs are the the raw scores!
-        logits = net_trained(images)
-        #add data to list
-        logits_list.append(logits)
-        labels_list.append(labels)
-        #convert to probabilities
-        output_probs = F.softmax(logits,dim=1)
-        #get predictions from class
-        probs, predicted = torch.max(output_probs, 1)
-        #total
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+#for index, value in np.ndenumerate(x):
+#    print(index[0], value)
 
-    logits = torch.cat(logits_list)
-    labels = torch.cat(labels_list)
+for i, inner_list in enumerate(x):
+    #print(i, inner_list)
 
-print('Accuracy of the network on the 10000 test images: %d %%' % (
-    100 * correct / total))
-print(total)
+    A = inner_list
+    
+    idx = np.argpartition(A, -k)
+    arr_threshold = np.max(A[idx[:-k]])
+    A[A <= arr_threshold] = -1
 
-################
-#metrics
+    #print(A)
 
-ece_criterion = metrics.ECELoss()
-#Torch version
-logits_np = logits.numpy()
-labels_np = labels.numpy()
-
-#Numpy Version
-print('ECE: %f' % (ece_criterion.loss(logits_np,labels_np, 15)))
-
-softmaxes = softmax(logits_np, axis=1)
-
-print('ECE with probabilties %f' % (ece_criterion.loss(softmaxes,labels_np,15,False)))
-
-mce_criterion = metrics.MCELoss()
-print('MCE: %f' % (mce_criterion.loss(logits_np,labels_np)))
-
-oe_criterion = metrics.OELoss()
-print('OE: %f' % (oe_criterion.loss(logits_np,labels_np)))
-
-sce_criterion = metrics.SCELoss()
-print('SCE: %f' % (sce_criterion.loss(logits_np,labels_np, 15)))
-
-ace_criterion = metrics.ACELoss()
-print('ACE: %f' % (ace_criterion.loss(logits_np,labels_np,15)))
-
-tace_criterion = metrics.TACELoss()
-threshold = 0.01
-print('TACE (threshold = %f): %f' % (threshold, tace_criterion.loss(logits_np,labels_np,threshold,15)))
-
-
-
-############
-#recalibration
-
-model = recalibration.ModelWithTemperature(net_trained)
-# Tune the model temperature, and save the results
-model.set_temperature(testloader)
-
-
-############
-#visualizations
-
-conf_hist = visualization.ConfidenceHistogram()
-plt_test = conf_hist.plot(logits_np,labels_np,title="Confidence Histogram")
-plt_test.savefig('plots/conf_histogram_test.png',bbox_inches='tight')
-#plt_test.show()
-
-rel_diagram = visualization.ReliabilityDiagram()
-plt_test_2 = rel_diagram.plot(logits_np,labels_np,title="Reliability Diagram")
-plt_test_2.savefig('plots/rel_diagram_test.png',bbox_inches='tight')
-#plt_test_2.show()
-
+    x[i] = A
 
