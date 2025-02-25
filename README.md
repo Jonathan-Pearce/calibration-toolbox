@@ -21,7 +21,7 @@ general_calibration_error = GCE(prob, labels, bin = 15, class_conditional = True
                                 top_k_classes = 1, norm = 1, thresholding = 0.00)
 
 ```
-Additionally, we provide a simpler interface to utilize commonly used metrics:
+Additionally, we provide a simple interface to utilize commonly used metrics:
 #### Expected Calibration Error (ECE)
 - Naeini et al. (2015) - [Obtaining Well Calibrated Probabilities Using Bayesian Binning](https://ojs.aaai.org/index.php/AAAI/article/view/9602)
 
